@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+
+import LetterGlitch from "@/components/LetterGlitch";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -24,9 +27,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} bg-black`}>
+        <aside
+          aria-hidden="true"
+          className="fixed inset-0 h-screen w-screen z-0 pointer-events-none"
+        >
+          <LetterGlitch centerVignette className="fixed inset-0 opacity-20" />
+        </aside>
         {children}
       </body>
     </html>
