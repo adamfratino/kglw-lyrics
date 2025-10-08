@@ -125,3 +125,63 @@ button,
 link {
   cursor: pointer;
 }
+
+/* CSS Scroll-driven animations with LERP smoothing for hero */
+
+/* Register custom properties for smooth interpolation */
+@property --scroll-progress {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --scroll-progress-delayed {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+/* Animate the scroll progress from 0 to 1 */
+@keyframes track-scroll {
+  to {
+    --scroll-progress: 1;
+    --scroll-progress-delayed: 1;
+  }
+}
+
+/* Apply scroll tracking to root */
+:root {
+  animation: track-scroll linear both;
+  animation-timeline: scroll(root);
+  animation-range: 0vh 100vh;
+}
+
+/* Create smooth LERP effect on child element */
+.hero-scroll-animate {
+  /* Delay the progress to create smooth interpolation */
+  transition: --scroll-progress-delayed 0.6s cubic-bezier(0.33, 1, 0.68, 1);
+
+  /* Calculate position and scale based on delayed scroll progress */
+  --smoothed-progress: var(--scroll-progress-delayed);
+
+  /* Calculate vertical movement: from center (50vh) to top (2rem ≈ 32px) */
+  /* At 0: 50vh - 50vh = 0 (centered) */
+  /* At 1: 50vh - 50vh - 48vh = -48vh (at top) */
+  --y-offset: calc(50vh - 50% - (var(--smoothed-progress) * 44vh));
+
+  /* Calculate scale: from 1 to 0.3 */
+  --scale-value: calc(1 - (var(--smoothed-progress) * 0.7));
+
+  /* ONLY use transform for 60fps GPU acceleration */
+  transform: translate3d(0, var(--y-offset), 0) scale(var(--scale-value));
+
+  /* Use will-change to hint browser for optimization */
+  will-change: transform;
+
+  /* Base positioning - keep at top, transform moves it */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}

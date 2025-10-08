@@ -9,7 +9,6 @@ import {
   deltaCorpsPriest1,
   dosRebel,
   amcNeko,
-  caligraphy,
   defLeppard,
   georgia11,
   poison,
@@ -23,7 +22,6 @@ const fonts = [
   deltaCorpsPriest1,
   dosRebel,
   amcNeko,
-  caligraphy,
   defLeppard,
   georgia11,
   poison,
@@ -44,7 +42,7 @@ const AsciiDisplay = ({ font }: { font: any }) => {
     fadeInOnly: true,
   });
 
-  return <pre ref={asciiTextRef as any} className="text-white z-10" />;
+  return <pre ref={asciiTextRef as any} className="text-white" />;
 };
 
 export const HeroTitle = () => {
@@ -56,7 +54,7 @@ export const HeroTitle = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen z-10">
+    <div className="flex flex-col justify-center items-center hero-scroll-animate">
       <button onClick={handleChangeFont} className="text-white">
         <AsciiDisplay font={activeFont} key={activeFont} />
       </button>
