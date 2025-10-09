@@ -37,6 +37,7 @@ export function TitlePercentageTable({
       accessor: (song: SongStats) => song.titleMentionCount,
       align: "right" as const,
       className: "font-mono",
+      isBarChart: true,
     },
   ];
 

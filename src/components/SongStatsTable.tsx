@@ -2,6 +2,7 @@
 
 import { useQueryState, parseAsInteger } from "nuqs";
 import type { SongStats } from "@/types/lyrics";
+import { AnimatedBarChart } from "./AnimatedBarChart";
 
 /**
  * Column configuration for flexible table rendering
@@ -11,6 +12,8 @@ interface Column {
   accessor: (song: SongStats) => string | number;
   align?: "left" | "right";
   className?: string;
+  /** If true, renders as an animated bar chart */
+  isBarChart?: boolean;
 }
 
 interface SongStatsTableProps {
@@ -50,6 +53,12 @@ export function SongStatsTable({
   const hasMore = currentLimit < songs.length;
   const remainingCount = songs.length - currentLimit;
 
+  // Calculate max values for bar chart columns
+  const maxValues = columns.map((column) => {
+    if (!column.isBarChart) return 0;
+    return Math.max(...songs.map((song) => Number(column.accessor(song)) || 0));
+  });
+
   const handleLoadMore = () => {
     setVisibleCount(currentLimit + loadMoreIncrement);
   };
@@ -86,7 +95,15 @@ export function SongStatsTable({
                       column.align === "right" ? "text-right" : ""
                     } ${column.className || ""}`}
                   >
-                    {column.accessor(song)}
+                    {column.isBarChart ? (
+                      <AnimatedBarChart
+                        value={Number(column.accessor(song))}
+                        maxValue={maxValues[colIndex]}
+                        animationSpeed={20}
+                      />
+                    ) : (
+                      column.accessor(song)
+                    )}
                   </td>
                 ))}
               </tr>

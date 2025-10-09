@@ -29,8 +29,8 @@ export function TitleMentionsTable({
     {
       header: "Mentions",
       accessor: (song: SongStats) => song.titleMentionCount,
-      align: "right" as const,
       className: "font-mono",
+      isBarChart: true,
     },
     {
       header: "Total Words",
