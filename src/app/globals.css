@@ -126,13 +126,8 @@ link {
   cursor: pointer;
 }
 
+/* Lo-fi stepped scroll animation for retro aesthetic */
 @property --scroll-progress {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 0;
-}
-
-@property --scroll-progress-delayed {
   syntax: "<number>";
   inherits: true;
   initial-value: 0;
@@ -141,24 +136,28 @@ link {
 @keyframes track-scroll {
   to {
     --scroll-progress: 1;
-    --scroll-progress-delayed: 1;
   }
 }
 
 :root {
+  --scroll-steps: 12;
+
   animation: track-scroll linear both;
   animation-timeline: scroll(root);
   animation-range: 0vh 100vh;
 }
 
 .hero-scroll-animate {
-  --smoothed-progress: var(--scroll-progress-delayed);
-  --y-offset: calc(50vh - 50% - (var(--smoothed-progress) * 44vh));
-  --scale-value: calc(1 - (var(--smoothed-progress) * 0.7));
+  --step-size: calc(1 / var(--scroll-steps));
+  --stepped-progress: calc(
+    round(var(--scroll-progress) / var(--step-size)) * var(--step-size)
+  );
+  --y-offset: calc(50vh - 50% - (var(--stepped-progress) * 44vh));
+  --scale-value: calc(1 - (var(--stepped-progress) * 0.7));
 
-  transition: --scroll-progress-delayed 0.6s cubic-bezier(0.33, 1, 0.68, 1);
   transform: translate3d(0, var(--y-offset), 0) scale(var(--scale-value));
   will-change: transform;
+
   position: fixed;
   top: 0;
   left: 0;

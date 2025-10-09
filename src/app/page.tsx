@@ -1,4 +1,4 @@
-import { HeroTitle } from "@/components/HeroTitle";
+import { HeroTitle } from "@/sections";
 
 export default function Home() {
   return (
@@ -9,7 +9,9 @@ export default function Home() {
       </div>
 
       {/* Main content that triggers scrolling */}
-      <div className="relative opacity-0 min-h-[200dvh]" />
+      <div className="relative min-h-screen max-w-lg mx-auto bg-red-500 flex flex-col justify-center items-center">
+        <h1 className="text-4xl font-bold">Hello</h1>
+      </div>
     </main>
   );
 }
