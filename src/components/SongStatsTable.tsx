@@ -9,7 +9,9 @@ import { AnimatedBarChart } from "./AnimatedBarChart";
  */
 interface Column {
   header: string;
-  accessor: (song: SongStats) => string | number;
+  accessor?: (song: SongStats) => string | number;
+  /** Custom render function for complex column content */
+  render?: (song: SongStats) => React.ReactNode;
   align?: "left" | "right";
   className?: string;
   /** If true, renders as an animated bar chart */
@@ -55,8 +57,9 @@ export function SongStatsTable({
 
   // Calculate max values for bar chart columns
   const maxValues = columns.map((column) => {
-    if (!column.isBarChart) return 0;
-    return Math.max(...songs.map((song) => Number(column.accessor(song)) || 0));
+    if (!column.isBarChart || !column.accessor) return 0;
+    const accessor = column.accessor;
+    return Math.max(...songs.map((song) => Number(accessor(song)) || 0));
   });
 
   const handleLoadMore = () => {
@@ -95,15 +98,17 @@ export function SongStatsTable({
                       column.align === "right" ? "text-right" : ""
                     } ${column.className || ""}`}
                   >
-                    {column.isBarChart ? (
+                    {column.render ? (
+                      column.render(song)
+                    ) : column.isBarChart && column.accessor ? (
                       <AnimatedBarChart
                         value={Number(column.accessor(song))}
                         maxValue={maxValues[colIndex]}
                         animationSpeed={20}
                       />
-                    ) : (
+                    ) : column.accessor ? (
                       column.accessor(song)
-                    )}
+                    ) : null}
                   </td>
                 ))}
               </tr>

@@ -2,6 +2,7 @@
 
 import type { SongStats } from "@/types/lyrics";
 import { SongStatsTable } from "@/components/SongStatsTable";
+import { AlbumImage } from "@/components/AlbumImage";
 
 interface TitlePercentageTableProps {
   songs: SongStats[];
@@ -23,19 +24,19 @@ export function TitlePercentageTable({
     },
     {
       header: "Album",
-      accessor: (song: SongStats) => song.album?.name || "Unknown",
+      render: (song: SongStats) => (
+        <AlbumImage albumName={song.album?.name || "Unknown"} size={40} />
+      ),
       className: "text-sm",
     },
     {
       header: "Percentage",
       accessor: (song: SongStats) => `${song.titleMentionPercentage}%`,
-      align: "right" as const,
       className: "font-mono",
     },
     {
       header: "Mentions",
       accessor: (song: SongStats) => song.titleMentionCount,
-      align: "right" as const,
       className: "font-mono",
       isBarChart: true,
     },

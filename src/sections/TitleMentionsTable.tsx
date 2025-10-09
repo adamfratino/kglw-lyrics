@@ -2,6 +2,7 @@
 
 import type { SongStats } from "@/types/lyrics";
 import { SongStatsTable } from "@/components/SongStatsTable";
+import { AlbumImage } from "@/components/AlbumImage";
 
 interface TitleMentionsTableProps {
   songs: SongStats[];
@@ -23,7 +24,9 @@ export function TitleMentionsTable({
     },
     {
       header: "Album",
-      accessor: (song: SongStats) => song.album?.name || "Unknown",
+      render: (song: SongStats) => (
+        <AlbumImage albumName={song.album?.name || "Unknown"} size={40} />
+      ),
       className: "text-sm",
     },
     {
