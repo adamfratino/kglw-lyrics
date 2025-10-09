@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useQueryState, parseAsInteger } from "nuqs";
 import type { SongStats } from "@/types/lyrics";
 
 /**
@@ -19,6 +19,7 @@ interface SongStatsTableProps {
   columns: Column[];
   initialLimit?: number;
   loadMoreIncrement?: number;
+  queryParamKey: string;
 }
 
 /**
@@ -27,6 +28,7 @@ interface SongStatsTableProps {
  * - Flexible column configuration
  * - Load more functionality
  * - Client-side pagination
+ * - URL-persisted state via query parameters
  */
 export function SongStatsTable({
   title,
@@ -34,19 +36,26 @@ export function SongStatsTable({
   columns,
   initialLimit = 10,
   loadMoreIncrement = 10,
+  queryParamKey,
 }: SongStatsTableProps) {
-  const [visibleCount, setVisibleCount] = useState(initialLimit);
+  const [visibleCount, setVisibleCount] = useQueryState(
+    queryParamKey,
+    parseAsInteger.withDefault(initialLimit)
+  );
 
-  const visibleSongs = songs.slice(0, visibleCount);
-  const hasMore = visibleCount < songs.length;
-  const remainingCount = songs.length - visibleCount;
+  // Ensure visibleCount is always a valid number
+  const currentLimit = visibleCount ?? initialLimit;
+
+  const visibleSongs = songs.slice(0, currentLimit);
+  const hasMore = currentLimit < songs.length;
+  const remainingCount = songs.length - currentLimit;
 
   const handleLoadMore = () => {
-    setVisibleCount((prev) => prev + loadMoreIncrement);
+    setVisibleCount(currentLimit + loadMoreIncrement);
   };
 
   return (
-    <section className="mb-16">
+    <section className="mb-16 bg-black">
       <h2 className="text-2xl font-bold mb-4">{title}</h2>
 
       <div className="overflow-x-auto">

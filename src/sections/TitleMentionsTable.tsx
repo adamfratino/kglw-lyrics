@@ -46,6 +46,7 @@ export function TitleMentionsTable({
       songs={songs}
       columns={columns}
       initialLimit={initialLimit}
+      queryParamKey="mentions"
     />
   );
 }

@@ -46,6 +46,7 @@ export function TitlePercentageTable({
       songs={songs}
       columns={columns}
       initialLimit={initialLimit}
+      queryParamKey="ratios"
     />
   );
 }
