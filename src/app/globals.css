@@ -121,6 +121,10 @@
   }
 }
 
+body {
+  color: white;
+}
+
 button,
 link {
   cursor: pointer;
@@ -140,7 +144,7 @@ link {
 }
 
 :root {
-  --scroll-steps: 12;
+  --scroll-steps: 10;
 
   animation: track-scroll linear both;
   animation-timeline: scroll(root);
