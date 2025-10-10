@@ -16,6 +16,8 @@ interface Column {
   className?: string;
   /** If true, renders as an animated bar chart */
   isBarChart?: boolean;
+  /** Custom formatter for bar chart values */
+  formatValue?: (value: number) => string;
 }
 
 interface SongStatsTableProps {
@@ -67,62 +69,91 @@ export function SongStatsTable({
   };
 
   return (
-    <section className="mb-16 bg-black">
-      <h2 className="text-2xl font-bold mb-4">{title}</h2>
+    <section className="mb-16 bg-black" role="region" aria-label={title}>
+      <h2 className="text-2xl font-bold mb-6">{title}</h2>
 
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left p-3">#</th>
-              {columns.map((column, index) => (
-                <th
-                  key={index}
-                  className={`p-3 ${
-                    column.align === "right" ? "text-right" : "text-left"
-                  }`}
-                >
-                  {column.header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {visibleSongs.map((song, index) => (
-              <tr key={song.id} className="border-b hover:bg-muted/50">
-                <td className="p-3">{index + 1}</td>
-                {columns.map((column, colIndex) => (
-                  <td
-                    key={colIndex}
-                    className={`p-3 ${
-                      column.align === "right" ? "text-right" : ""
-                    } ${column.className || ""}`}
-                  >
-                    {column.render ? (
-                      column.render(song)
-                    ) : column.isBarChart && column.accessor ? (
-                      <AnimatedBarChart
-                        value={Number(column.accessor(song))}
-                        maxValue={maxValues[colIndex]}
-                        animationSpeed={20}
-                      />
-                    ) : column.accessor ? (
-                      column.accessor(song)
+      <div className="space-y-4" role="list">
+        {visibleSongs.map((song, index) => {
+          // Find the columns we need
+          const titleColumn = columns.find((col) => col.header === "Song");
+          const albumColumn = columns.find((col) => col.header === "Album");
+          const barChartColumn = columns.find((col) => col.isBarChart);
+          const statsColumns = columns.filter(
+            (col) =>
+              !col.isBarChart && col.header !== "Song" && col.header !== "Album"
+          );
+
+          return (
+            <article
+              key={song.id}
+              className="border border-primary/20 rounded-lg p-6 hover:border-primary/40 transition-colors min-h-[160px]"
+              role="listitem"
+            >
+              {/* Top Row: Rank, Title, Album */}
+              <div className="flex items-center">
+                <div className="text-xl font-bold min-w-[2.5rem]">
+                  #{index + 1}
+                </div>
+                <div className="flex-1 flex items-center gap-4">
+                  {titleColumn?.accessor && (
+                    <h3 className="text-3xl font-semibold font-mono">
+                      {titleColumn.accessor(song)}
+                    </h3>
+                  )}
+                  <div className="ml-auto">
+                    {albumColumn?.render && albumColumn.render(song)}
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Row: Bar Chart (left) + Stats (right) */}
+              <div className="grid grid-cols-1 items-center">
+                {/* Bar Chart Section */}
+                {barChartColumn && (
+                  <div className="min-h-[60px] flex items-center">
+                    {barChartColumn.accessor ? (
+                      <div className="w-full">
+                        <AnimatedBarChart
+                          value={Number(barChartColumn.accessor(song))}
+                          maxValue={maxValues[columns.indexOf(barChartColumn)]}
+                          animationSpeed={20}
+                          formatValue={barChartColumn.formatValue}
+                        />
+                      </div>
                     ) : null}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  </div>
+                )}
+
+                {/* Stats Section */}
+                {statsColumns.length > 0 && (
+                  <div className="flex gap-2">
+                    {statsColumns.map((column, colIndex) => (
+                      <div key={colIndex} className="text-right">
+                        <div className="text-lg font-mono font-semibold">
+                          of{" "}
+                          {column.render
+                            ? column.render(song)
+                            : column.accessor
+                            ? column.accessor(song)
+                            : null}{" "}
+                          words
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </article>
+          );
+        })}
       </div>
 
       {/* Load More Button */}
       {hasMore && (
-        <div className="mt-6 text-center">
+        <div className="mt-8 text-center">
           <button
             onClick={handleLoadMore}
-            className="px-6 py-2 border border-primary/50 hover:bg-primary/10 rounded transition-colors"
+            className="px-8 py-3 border border-primary/50 hover:bg-primary/10 rounded-lg transition-colors font-medium"
           >
             Load More ({remainingCount} remaining)
           </button>

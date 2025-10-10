@@ -8,6 +8,8 @@ interface AnimatedBarChartProps {
   label?: string;
   animationSpeed?: number;
   className?: string;
+  /** Custom formatter for displaying the value */
+  formatValue?: (value: number) => string;
 }
 
 const ANIMATION_CHARS = ["░", "▒", "█"];
@@ -23,8 +25,9 @@ export function AnimatedBarChart({
   value,
   maxValue,
   label,
-  animationSpeed = 30,
+  animationSpeed = 150,
   className = "",
+  formatValue,
 }: AnimatedBarChartProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [animationProgress, setAnimationProgress] = useState(0);
@@ -39,15 +42,15 @@ export function AnimatedBarChart({
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          // Trigger when 40% of the element is visible
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.4) {
+          // Trigger when 80% of the element is visible (closer to middle of viewport)
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.8) {
             setIsVisible(true);
             observer.unobserve(entry.target);
           }
         });
       },
       {
-        threshold: [0, 0.4, 1],
+        threshold: [0, 0.2, 0.4, 0.6, 0.8, 1.0],
       }
     );
 
@@ -119,9 +122,9 @@ export function AnimatedBarChart({
       className={`flex items-center gap-3 font-mono ${className}`}
     >
       {label && <span className="text-sm min-w-fit">{label}</span>}
-      <div className="flex-1 flex items-center gap-2">
-        <div className="relative flex-1">
-          <pre className="text-xs leading-none text-white">
+      <div className="flex-1 flex items-center gap-4">
+        <div className="relative">
+          <pre className="text-[clamp(0.25rem,3cqw,2rem)] leading-none text-white">
             {generateBar()}
             {isAnimating && (
               <span className="animate-pulse opacity-50">
@@ -131,11 +134,11 @@ export function AnimatedBarChart({
           </pre>
         </div>
         <span
-          className={`text-sm font-bold min-w-[3rem] transition-opacity duration-500 ${
+          className={`text-3xl mt-2 font-bold min-w-[3rem] transition-opacity duration-500 ${
             showValue ? "opacity-100" : "opacity-0"
           }`}
         >
-          {value}
+          {formatValue ? formatValue(value) : value}
         </span>
       </div>
     </div>

@@ -31,14 +31,15 @@ export function TitlePercentageTable({
     },
     {
       header: "Percentage",
-      accessor: (song: SongStats) => `${song.titleMentionPercentage}%`,
+      accessor: (song: SongStats) => song.titleMentionPercentage,
       className: "font-mono",
+      isBarChart: true,
+      formatValue: (value: number) => `${value}%`,
     },
     {
       header: "Mentions",
       accessor: (song: SongStats) => song.titleMentionCount,
       className: "font-mono",
-      isBarChart: true,
     },
   ];
 
